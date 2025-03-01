@@ -27,7 +27,7 @@ param (
 
 # Show help message
 if ($help) {
-    Write-Output @"
+    Write-Host @"
 Usage: .\imageScraper.ps1 [-url <URL>] [-html <FilePath>] [-outputPath <Path>] [-max <Number>] [-extension <Extension>] [-noCopy] [-help]
 
 Parameters:
@@ -38,29 +38,29 @@ Parameters:
     -noCopy (n)     Prevents duplicate file names
     -extension (e)  Image extension (default: png)
     -help (h)       Show this message
-"@
+"@ -ForegroundColor Cyan
     exit
 }
 
 # Ensure at least one required parameter is present
 if (-not $url -and -not $htmlFilePath) {
-    Write-Error "Error: You must specify either -url or -html. Use -help for more information."
+    Write-Host "Error: You must specify either -url or -html. Use -help for more information." -ForegroundColor Red
     exit 1
 }
 
 # Create output folder if it does not exist
 if (-not (Test-Path $outputPath)) {
-    Write-Output "Creating output folder: $outputPath"
+    Write-Host "Creating output folder: $outputPath" -ForegroundColor Yellow
     New-Item -ItemType Directory -Path $outputPath | Out-Null
 }
 
 # Get HTML content from a file or URL
 try {
     if ($htmlFilePath) {
-        Write-Output "Reading HTML from file: $htmlFilePath"
+        Write-Host "Reading HTML from file: $htmlFilePath" -ForegroundColor Green
         $htmlContent = Get-Content -Path $htmlFilePath -Raw
     } else {
-        Write-Output "Fetching webpage: $url"
+        Write-Host "Fetching webpage: $url" -ForegroundColor Green
         $response = Invoke-WebRequest -Uri $url
         $htmlContent = $response.Content
     }
@@ -73,9 +73,9 @@ try {
             Alt = $_.Groups[2].Value
         }
     }
-    Write-Output "$($imageUrls.Count) images found."
+    Write-Host "$($imageUrls.Count) images found." -ForegroundColor Cyan
 } catch {
-    Write-Error "Error: Unable to retrieve or process HTML. $_"
+    Write-Host "Error: Unable to retrieve or process HTML. $_" -ForegroundColor Red
     exit 1
 }
 
@@ -95,7 +95,7 @@ foreach ($image in $imageUrls) {
             $baseUri = [System.Uri]::new($url)
             $src = (New-Object System.Uri($baseUri, $src)).AbsoluteUri
         } else {
-            Write-Output "Skipping image $imageNumber : Relative URL without base."
+            Write-Host "Skipping image $imageNumber : Relative URL without base." -ForegroundColor Yellow
             continue
         }
     }
@@ -120,14 +120,14 @@ foreach ($image in $imageUrls) {
 
     # Download the image
     try {
-        Write-Output "Downloading image $imageNumber : $src"
+        Write-Host "Downloading image $imageNumber : $src" -ForegroundColor Blue
         Invoke-WebRequest -Uri $src -OutFile $filePath -ErrorAction Stop
-        Write-Output "Saved to: $filePath"
+        Write-Host "Saved to: $filePath" -ForegroundColor Green
     } catch {
-        Write-Output "Error downloading image $imageNumber : $_"
+        Write-Host "Error downloading image $imageNumber : $_" -ForegroundColor Red
     }
 
     $imageNumber++
 }
 
-Write-Output "Image download completed. Total downloaded: $($imageNumber - 1)."
+Write-Host "Image download completed. Total downloaded: $($imageNumber - 1)." -ForegroundColor Cyan
