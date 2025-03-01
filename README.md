@@ -28,7 +28,7 @@ Extracts and downloads images from a specified website or a local HTML file.
 ```
 
 #### Parameters:
-- `-url` (`-u`): The URL of the website to scrape images from (required if `-htmlFilePath` is not provided).
+- `-url` (`-u`): The URL of the website to scrape images from (required if `-htmlFilePath` is not provided). Note: This script only extracts images that are directly embedded in the HTML and does not handle images loaded dynamically via JavaScript.
 - `-outputPath` (`-o`): Folder where images will be saved (default: script directory).
 - `-max` (`-m`): Maximum number of images to extract (default: all).
 - `-noCopy` (`-n`): Prevents duplicate file creation.
